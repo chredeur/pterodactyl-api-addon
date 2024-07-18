@@ -16,6 +16,7 @@ use Pterodactyl\Repositories\Eloquent\NodeRepository;
 use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
 use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
 use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
+use Illuminate\Support\Facades\Log;
 
 class ServerTransfertApplicationController extends ApplicationApiController
 {
@@ -51,6 +52,7 @@ class ServerTransfertApplicationController extends ApplicationApiController
 
         // Check if the node is viable for the transfer.
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
+        Log::channel('daily')->info($server->memory->toString());
         if (!$node->isViable($server->memory, $server->disk)) {
             return new JsonResponse(['status_code' => 'Bad Request', 'status' => 400, 'detail' => 'The node you have chosen is not viable.'], 400);
         }
