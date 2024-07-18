@@ -8,8 +8,6 @@ use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Prologue\Alerts\AlertsMessageBag;
 use Pterodactyl\Models\ServerTransfer;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Http\Controllers\Controller;
@@ -19,7 +17,7 @@ use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
 use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
 use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
 
-class ServerTransferApplicationController extends ApplicationApiController
+class ServerTransfertApplicationController extends ApplicationApiController
 {
     /**
      * ServerTransferApplicationController constructor.
