@@ -1,6 +1,6 @@
 <?php
 
-namespace Xepare\PterodactylApiAddon;
+namespace Chredeur\PterodactylApiAddon;
 
 use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelPackageTools\Package;
