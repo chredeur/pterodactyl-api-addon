@@ -6,9 +6,9 @@ use Chredeur\PterodactylApiAddon\Http\Controllers\ServerTransfertApplicationCont
 
 Route::prefix('/api/application')->middleware(['api', 'throttle:api.application'])->group(function () {
 
-    Route::group(['prefix' => '/transfer'], function () {
+    Route::group(['prefix' => '/servers'], function () {
         /** Transfer Server */
-        Route::post('/{server:id}', [ServerTransfertApplicationController::class, 'transfer'])->name('api.application.transfer');
+        Route::post('/{server:id}/transfer', [ServerTransfertApplicationController::class, 'transfer'])->name('api.application.servers.transfer');
     });
 
 });
