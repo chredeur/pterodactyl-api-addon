@@ -50,7 +50,7 @@ class ServerTransfertApplicationController extends ApplicationApiController
         ]);
 
         $node_id = $validatedData['node_id'];
-        $server_uuid = $validatedData['server_id'];
+        $server_uuid = $validatedData['server_uuid'];
         $allocation_id = intval($validatedData['allocation_id']);
         $additional_allocations = array_map('intval', $validatedData['allocation_additional'] ?? []);
 
