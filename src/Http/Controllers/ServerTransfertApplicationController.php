@@ -96,7 +96,7 @@ class ServerTransfertApplicationController extends ApplicationApiController
             return $transfer;
         });
 
-        return JsonResponse::create([], JsonResponse::HTTP_NO_CONTENT);
+        return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }
 
     /**
