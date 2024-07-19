@@ -1,7 +1,7 @@
 # This package adds an API interface to the application API, enabling server transfers between nodes.
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/chredeur/pterodactyl-api-addon.svg?style=flat-square)](https://packagist.org/packages/chredeur/pterodactyl-api-addon)
-[![Total Downloads](https://img.shields.io/packagist/dt/chredeur/pterodactyl-api-addon.svg?style=flat-square)](https://packagist.org/packages/pterodactylapiaddon/pterodactyl-api-addon)
+[![Total Downloads](https://img.shields.io/packagist/dt/chredeur/pterodactyl-api-addon.svg?style=flat-square)](https://packagist.org/packages/chredeur/pterodactyl-api-addon)
 
 ## Installation
 
