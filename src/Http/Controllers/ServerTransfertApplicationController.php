@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Chredeur\PterodactylApiAddon\Http\Controllers;
 
 use Carbon\CarbonImmutable;
@@ -10,13 +9,14 @@ use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Models\ServerTransfer;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Services\Nodes\NodeJWTService;
 use Pterodactyl\Repositories\Eloquent\NodeRepository;
 use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
 use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
+use Pterodactyl\Http\Requests\Api\Application\Servers\ServerWriteRequest;
 use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ServerTransfertApplicationController extends ApplicationApiController
 {
@@ -36,9 +36,9 @@ class ServerTransfertApplicationController extends ApplicationApiController
     /**
      * Starts a transfer of a server to a new node.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function transfer(Request $request, Server $server): JsonResponse
+    public function transfer(ServerWriteRequest $request, Server $server): JsonResponse
     {
         $validatedData = $request->validate([
             'node_id' => 'required|exists:nodes,id',
