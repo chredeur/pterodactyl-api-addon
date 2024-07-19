@@ -5,12 +5,12 @@ namespace Chredeur\PterodactylApiAddon\Http\Controllers;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Models\ServerTransfer;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Services\Nodes\NodeJWTService;
 use Pterodactyl\Repositories\Eloquent\NodeRepository;
+use Pterodactyl\Repositories\Eloquent\ServerRepository;
 use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
 use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
 use Pterodactyl\Http\Requests\Api\Application\Servers\ServerWriteRequest;
@@ -28,7 +28,8 @@ class ServerTransfertApplicationController extends ApplicationApiController
         private ConnectionInterface           $connection,
         private DaemonTransferRepository      $daemonTransferRepository,
         private NodeJWTService                $nodeJWTService,
-        private NodeRepository                $nodeRepository
+        private NodeRepository                $nodeRepository,
+        private ServerRepository              $serverRepository
     ){
         parent::__construct();
     }
@@ -38,15 +39,17 @@ class ServerTransfertApplicationController extends ApplicationApiController
      *
      * @throws Throwable
      */
-    public function transfer(ServerWriteRequest $request, Server $server): JsonResponse
+    public function transfer(ServerWriteRequest $request): JsonResponse
     {
         $validatedData = $request->validate([
             'node_id' => 'required|exists:nodes,id',
+            'server_id' => 'required|exists:servers,id',
             'allocation_id' => 'required|bail|unique:servers|exists:allocations,id',
             'allocation_additional' => 'nullable',
         ]);
 
         $node_id = $validatedData['node_id'];
+        $server_id = $validatedData['server_id'];
         $allocation_id = intval($validatedData['allocation_id']);
         $additional_allocations = array_map('intval', $validatedData['allocation_additional'] ?? []);
 
@@ -54,9 +57,9 @@ class ServerTransfertApplicationController extends ApplicationApiController
         Log::channel('daily')->info($allocation_id);
         // Check if the node is viable for the transfer.
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
+        $server = $this->serverRepository->getNodeWithResourceUsage($server_id);
         Log::channel('daily')->info($node->memory);
         Log::channel('daily')->info($server->node_id);
-        return new JsonResponse(['status_code' => 'Bad Request', 'status' => 400, 'detail' => 'The node you have chosen is not viable.'], 400);
         if (!$node->isViable($server->memory, $server->disk)) {
             return new JsonResponse(['status_code' => 'Bad Request', 'status' => 400, 'detail' => 'The node you have chosen is not viable.'], 400);
         }
