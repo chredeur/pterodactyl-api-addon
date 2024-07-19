@@ -3,6 +3,7 @@
 namespace Chredeur\PterodactylApiAddon\Http\Controllers;
 
 use Carbon\CarbonImmutable;
+use Grpc\Server;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -43,13 +44,13 @@ class ServerTransfertApplicationController extends ApplicationApiController
     {
         $validatedData = $request->validate([
             'node_id' => 'required|exists:nodes,id',
-            'server_id' => 'required|exists:servers,id',
+            'server_uuid' => 'required|exists:servers,uuid',
             'allocation_id' => 'required|bail|unique:servers|exists:allocations,id',
             'allocation_additional' => 'nullable',
         ]);
 
         $node_id = $validatedData['node_id'];
-        $server_id = $validatedData['server_id'];
+        $server_uuid = $validatedData['server_id'];
         $allocation_id = intval($validatedData['allocation_id']);
         $additional_allocations = array_map('intval', $validatedData['allocation_additional'] ?? []);
 
@@ -57,7 +58,7 @@ class ServerTransfertApplicationController extends ApplicationApiController
         Log::channel('daily')->info($allocation_id);
         // Check if the node is viable for the transfer.
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
-        $server = $this->serverRepository->getNodeWithResourceUsage($server_id);
+        $server = $this->serverRepository->getByUuid($server_uuid);
         Log::channel('daily')->info($node->memory);
         Log::channel('daily')->info($server->node_id);
         if (!$node->isViable($server->memory, $server->disk)) {
