@@ -56,8 +56,11 @@ class ServerTransfertApplicationController extends ApplicationApiController
         // Check if the node is viable for the transfer.
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
         $server = $this->serverRepository->getByUuid($server_uuid);
+        if ($node->id === $server->node_id) {
+            return new JsonResponse(['code' => 'Bad Request', 'status' => "400", 'detail' => 'You cannot transfer servers to this node.'], 400);
+        }
         if (!$node->isViable($server->memory, $server->disk)) {
-            return new JsonResponse(['status_code' => 'Bad Request', 'status' => 400, 'detail' => 'The node you have chosen is not viable.'], 400);
+            return new JsonResponse(['code' => 'Bad Request', 'status' => "400", 'detail' => 'The node you have chosen is not viable.'], 400);
         }
 
         $server->validateTransferState();
