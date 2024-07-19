@@ -54,6 +54,7 @@ class ServerTransfertApplicationController extends ApplicationApiController
         Log::channel('daily')->info($allocation_id);
         // Check if the node is viable for the transfer.
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
+        Log::channel('daily')->info($node->memory);
         if (!$node->isViable($server->memory, $server->disk)) {
             return new JsonResponse(['status_code' => 'Bad Request', 'status' => 400, 'detail' => 'The node you have chosen is not viable.'], 400);
         }
