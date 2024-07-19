@@ -16,7 +16,6 @@ use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
 use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
 use Pterodactyl\Http\Requests\Api\Application\Servers\ServerWriteRequest;
 use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
-use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class ServerTransfertApplicationController extends ApplicationApiController
@@ -40,27 +39,23 @@ class ServerTransfertApplicationController extends ApplicationApiController
      *
      * @throws Throwable
      */
-    public function transfer(ServerWriteRequest $request, Server $server): JsonResponse
+    public function transfer(ServerWriteRequest $request): JsonResponse
     {
         $validatedData = $request->validate([
             'node_id' => 'required|exists:nodes,id',
-            //'server_uuid' => 'required|exists:servers,uuid',
+            'server_uuid' => 'required|exists:servers,uuid',
             'allocation_id' => 'required|bail|unique:servers|exists:allocations,id',
             'allocation_additional' => 'nullable',
         ]);
 
         $node_id = $validatedData['node_id'];
-        //$server_uuid = $validatedData['server_uuid'];
+        $server_uuid = $validatedData['server_uuid'];
         $allocation_id = intval($validatedData['allocation_id']);
         $additional_allocations = array_map('intval', $validatedData['allocation_additional'] ?? []);
 
-        Log::channel('daily')->info($node_id);
-        Log::channel('daily')->info($allocation_id);
         // Check if the node is viable for the transfer.
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
-        //$server = $this->serverRepository->getByUuid($server_uuid);
-        Log::channel('daily')->info($node->memory);
-        Log::channel('daily')->info($server->memory);
+        $server = $this->serverRepository->getByUuid($server_uuid);
         if (!$node->isViable($server->memory, $server->disk)) {
             return new JsonResponse(['status_code' => 'Bad Request', 'status' => 400, 'detail' => 'The node you have chosen is not viable.'], 400);
         }

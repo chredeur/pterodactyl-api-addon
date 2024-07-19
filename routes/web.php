@@ -8,7 +8,7 @@ Route::prefix('/api/application')->middleware(['api', 'throttle:api.application'
 
     Route::group(['prefix' => '/servers'], function () {
         /** Transfer Server */
-        Route::post('/{server:id}/transfer', [ServerTransfertApplicationController::class, 'transfer'])->name('api.application.servers.transfer');
+        Route::post('/transfer', [ServerTransfertApplicationController::class, 'transfer'])->name('api.application.servers.transfer');
     });
 
 });
