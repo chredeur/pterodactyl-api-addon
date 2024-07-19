@@ -3,7 +3,7 @@
 namespace Chredeur\PterodactylApiAddon\Http\Controllers;
 
 use Carbon\CarbonImmutable;
-use Grpc\Server;
+use Pterodactyl\Models\Server;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
