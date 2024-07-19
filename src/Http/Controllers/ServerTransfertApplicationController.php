@@ -56,6 +56,7 @@ class ServerTransfertApplicationController extends ApplicationApiController
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
         Log::channel('daily')->info($node->memory);
         Log::channel('daily')->info($server->node_id);
+        return new JsonResponse(['status_code' => 'Bad Request', 'status' => 400, 'detail' => 'The node you have chosen is not viable.'], 400);
         if (!$node->isViable($server->memory, $server->disk)) {
             return new JsonResponse(['status_code' => 'Bad Request', 'status' => 400, 'detail' => 'The node you have chosen is not viable.'], 400);
         }
