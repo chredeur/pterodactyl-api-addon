@@ -16,6 +16,7 @@ use Pterodactyl\Repositories\Eloquent\NodeRepository;
 use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
 use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
 use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
+use Illuminate\Support\Facades\Log;
 
 class ServerTransfertApplicationController extends ApplicationApiController
 {
@@ -49,6 +50,8 @@ class ServerTransfertApplicationController extends ApplicationApiController
         $allocation_id = intval($validatedData['allocation_id']);
         $additional_allocations = array_map('intval', $validatedData['allocation_additional'] ?? []);
 
+        Log::channel('daily')->info($node_id->toString());
+        Log::channel('daily')->info($allocation_id->toString());
         // Check if the node is viable for the transfer.
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
         if (!$node->isViable($server->memory, $server->disk)) {
