@@ -40,17 +40,17 @@ class ServerTransfertApplicationController extends ApplicationApiController
      *
      * @throws Throwable
      */
-    public function transfer(ServerWriteRequest $request): JsonResponse
+    public function transfer(ServerWriteRequest $request, Server $server): JsonResponse
     {
         $validatedData = $request->validate([
             'node_id' => 'required|exists:nodes,id',
-            'server_uuid' => 'required|exists:servers,uuid',
+            //'server_uuid' => 'required|exists:servers,uuid',
             'allocation_id' => 'required|bail|unique:servers|exists:allocations,id',
             'allocation_additional' => 'nullable',
         ]);
 
         $node_id = $validatedData['node_id'];
-        $server_uuid = $validatedData['server_uuid'];
+        //$server_uuid = $validatedData['server_uuid'];
         $allocation_id = intval($validatedData['allocation_id']);
         $additional_allocations = array_map('intval', $validatedData['allocation_additional'] ?? []);
 
@@ -58,7 +58,7 @@ class ServerTransfertApplicationController extends ApplicationApiController
         Log::channel('daily')->info($allocation_id);
         // Check if the node is viable for the transfer.
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
-        $server = $this->serverRepository->getByUuid($server_uuid);
+        //$server = $this->serverRepository->getByUuid($server_uuid);
         Log::channel('daily')->info($node->memory);
         Log::channel('daily')->info($server->memory);
         if (!$node->isViable($server->memory, $server->disk)) {
