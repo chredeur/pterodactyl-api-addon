@@ -60,7 +60,7 @@ class ServerTransfertApplicationController extends ApplicationApiController
             return new JsonResponse(["errors" => [['code' => 'Bad Request', 'status' => "400", 'detail' => 'You cannot transfer servers to this node.']]], 400);
         }
         if (!$node->isViable($server->memory, $server->disk)) {
-            return new JsonResponse(["errors" => [['code' => 'Bad Request', 'status' => "400", 'detail' => 'The node you have chosen is not viable..']]], 400);
+            return new JsonResponse(["errors" => [['code' => 'Bad Request', 'status' => "400", 'detail' => 'The node you have chosen is not viable.']]], 400);
         }
 
         $server->validateTransferState();
