@@ -2,6 +2,7 @@
 
 
 use Illuminate\Support\Facades\Route;
+use Chredeur\PterodactylApiAddon\Http\Controllers\MountApplicationController;
 use Chredeur\PterodactylApiAddon\Http\Controllers\ServerMountApplicationController;
 use Chredeur\PterodactylApiAddon\Http\Controllers\ServerTransfertApplicationController;
 
@@ -33,6 +34,14 @@ Route::prefix('/api/application')
                 Route::delete('/{mount:id}', [ServerMountApplicationController::class, 'delete'])
                     ->name('api.application.servers.mounts.delete');
             });
+        });
+
+        /** Mounts */
+        Route::group(['prefix' => '/mounts'], function () {
+            Route::get('/', [MountApplicationController::class, 'index'])
+                ->name('api.application.mounts');
+            Route::get('/{mount:id}', [MountApplicationController::class, 'view'])
+                ->name('api.application.mounts.view');
         });
 
     });

@@ -26,7 +26,9 @@ clé applicative appartenant à un compte administrateur, présentée en
 | Méthode | Route | Effet |
 | --- | --- | --- |
 | `POST` | `/servers/transfer` | Démarre un transfert de serveur vers un autre node |
-| `GET` | `/servers/{server}/mounts` | Liste les montages attachés |
+| `GET` | `/mounts` | Liste les montages du panel |
+| `GET` | `/mounts/{mount}` | Détaille un montage |
+| `GET` | `/servers/{server}/mounts` | Liste les montages attachés à un serveur |
 | `POST` | `/servers/{server}/mounts` | Attache plusieurs montages (corps `{"mounts": [1,2]}`) |
 | `POST` | `/servers/{server}/mounts/{mount}` | Attache un montage |
 | `DELETE` | `/servers/{server}/mounts/{mount}` | Détache un montage |
@@ -34,11 +36,19 @@ clé applicative appartenant à un compte administrateur, présentée en
 `{server}` et `{mount}` sont les identifiants numériques (`id`), comme dans les routes
 admin du panel.
 
+`GET /mounts` accepte deux filtres facultatifs, `egg_id` et `node_id`. Fournis ensemble,
+ils retournent les montages réellement attachables à un serveur bâti sur cet egg et ce
+node — la même règle que celle appliquée à l'attache.
+
 ### Exemples
 
 ```bash
 PANEL=https://panel.example.com
 KEY=ptla_xxxxxxxxxxxxxxxxxxxx
+
+# Lister les montages attachables sur un egg et un node donnés
+curl "$PANEL/api/application/mounts?egg_id=5&node_id=2" \
+  -H "Authorization: Bearer $KEY" -H "Accept: application/json"
 
 # Attacher un montage
 curl -X POST "$PANEL/api/application/servers/12/mounts/3" \
