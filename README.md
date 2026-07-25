@@ -1,4 +1,6 @@
 # Pterodactyl Application API addon
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/chredeur/pterodactyl-api-addon.svg?style=flat-square)](https://packagist.org/packages/chredeur/pterodactyl-api-addon)
+[![Total Downloads](https://img.shields.io/packagist/dt/chredeur/pterodactyl-api-addon.svg?style=flat-square)](https://packagist.org/packages/chredeur/pterodactyl-api-addon)
 
 Ajoute à l'API applicative de Pterodactyl des endpoints que le panel n'expose pas :
 le transfert de serveur entre nodes, et la gestion des montages d'un serveur.
