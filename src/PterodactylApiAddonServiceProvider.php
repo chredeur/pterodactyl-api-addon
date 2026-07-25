@@ -3,7 +3,6 @@
 namespace Chredeur\PterodactylApiAddon;
 
 use Illuminate\Support\ServiceProvider;
-use Spatie\LaravelPackageTools\Package;
 
 class PterodactylApiAddonServiceProvider extends ServiceProvider
 {

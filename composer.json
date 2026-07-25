@@ -1,6 +1,6 @@
 {
     "name": "chredeur/pterodactyl-api-addon",
-    "description": "This package adds an API interface to the application API, enabling server transfers between nodes.",
+    "description": "This package adds endpoints to the Pterodactyl application API: server transfers between nodes, and attaching/detaching mounts to a server.",
     "keywords": [
         "PterodactylApiAddon",
         "laravel",
@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^8.0|^8.1|^8.2|^8.3"
+        "php": "^8.2 || ^8.3"
     },
     "autoload": {
         "psr-4": {

@@ -3,6 +3,7 @@
 namespace Chredeur\PterodactylApiAddon\Http\Controllers;
 
 use Carbon\CarbonImmutable;
+use Pterodactyl\Enum\JwtScope;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
@@ -74,7 +75,7 @@ class ServerTransfertApplicationController extends ApplicationApiController
             $transfer->new_node = $node_id;
             $transfer->old_allocation = $server->allocation_id;
             $transfer->new_allocation = $allocation_id;
-            $transfer->old_additional_allocations = $server->allocations->where('id', '!=', $server->allocation_id)->pluck('id');
+            $transfer->old_additional_allocations = $server->allocations->where('id', '!=', $server->allocation_id)->pluck('id')->values()->toArray();
             $transfer->new_additional_allocations = $additional_allocations;
 
             $transfer->save();
@@ -83,10 +84,13 @@ class ServerTransfertApplicationController extends ApplicationApiController
             $this->assignAllocationsToServer($server, $node_id, $allocation_id, $additional_allocations);
 
             // Generate a token for the destination node that the source node can use to authenticate with.
+            // Since panel 1.12.3, NodeJWTService::handle() takes two arguments and requires at
+            // least one scope, otherwise it throws. See Admin\Servers\ServerTransferController.
             $token = $this->nodeJWTService
                 ->setExpiresAt(CarbonImmutable::now()->addMinutes(15))
                 ->setSubject($server->uuid)
-                ->handle($transfer->newNode, $server->uuid, 'sha256');
+                ->setScopes(JwtScope::ServerTransfer)
+                ->handle($transfer->newNode, $server->uuid);
 
             // Notify the source node of the pending outgoing transfer.
             $this->daemonTransferRepository->setServer($server)->notify($transfer->newNode, $token);
