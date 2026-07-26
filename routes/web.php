@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use Chredeur\PterodactylApiAddon\Http\Controllers\MountApplicationController;
 use Chredeur\PterodactylApiAddon\Http\Controllers\ServerMountApplicationController;
 use Chredeur\PterodactylApiAddon\Http\Controllers\ServerTransfertApplicationController;
+use Chredeur\PterodactylApiAddon\Http\Controllers\SsoLoginController;
+use Chredeur\PterodactylApiAddon\Http\Controllers\UserSsoApplicationController;
 
 /*
 | Same middleware stack as the panel's application API. The "application-api" group is
@@ -44,4 +46,24 @@ Route::prefix('/api/application')
                 ->name('api.application.mounts.view');
         });
 
+        /** Single sign-on */
+        Route::post('/users/{user:id}/sso', [UserSsoApplicationController::class, 'store'])
+            ->name('api.application.users.sso');
+
     });
+
+/*
+| The redemption side of single sign-on. On the web group because it needs the session,
+| and without "guest" so a visitor already signed in as another account can be switched
+| over rather than bounced.
+|
+| Under /auth/ on purpose: RequireTwoFactorAuthentication lets that prefix through, which
+| it must, otherwise the redirect could never complete. The policy still applies on the
+| page the visitor lands on.
+|
+| Throttled with the panel's own authentication limiter. The token is 32 random bytes so
+| guessing is not a concern, but there is no reason to leave the endpoint unmetered.
+*/
+Route::middleware(['web', 'throttle:authentication'])
+    ->get('/auth/sso/{token}', SsoLoginController::class)
+    ->name('auth.sso');

@@ -34,6 +34,7 @@ clé applicative appartenant à un compte administrateur, présentée en
 | `POST` | `/servers/{server}/mounts` | Attache plusieurs montages (corps `{"mounts": [1,2]}`) |
 | `POST` | `/servers/{server}/mounts/{mount}` | Attache un montage |
 | `DELETE` | `/servers/{server}/mounts/{mount}` | Détache un montage |
+| `POST` | `/users/{user}/sso` | Génère un lien de connexion automatique |
 
 `{server}` et `{mount}` sont les identifiants numériques (`id`), comme dans les routes
 admin du panel.
@@ -86,6 +87,63 @@ Réponses : `200` avec la ressource `mount` transformée pour les attaches et la
   (`MountRepository::getMountListForServer`).
 - **Erreurs.** `404` si le serveur ou le montage n'existe pas, `422` si le corps de
   l'attache en masse est invalide.
+
+## Connexion automatique (SSO)
+
+Permet à un système de facturation de déposer un client directement dans son serveur,
+sans mot de passe. Deux routes : l'une délivre un jeton, l'autre le consomme.
+
+```bash
+curl -X POST "$PANEL/api/application/users/42/sso" \
+  -H "Authorization: Bearer $KEY" -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"redirect": "/server/1a7ce997"}'
+```
+
+```json
+{
+  "object": "sso",
+  "attributes": {
+    "url": "https://panel.example.com/auth/sso/3f2a...",
+    "expires_at": "2026-07-26T12:00:00+00:00"
+  }
+}
+```
+
+Il suffit ensuite de rediriger le navigateur du client vers cette URL. La session est
+ouverte et il atterrit sur la page demandée.
+
+Permission requise : écriture sur la ressource `users`. L'appel ne modifie pas le compte,
+mais il délivre la capacité d'ouvrir une session dessus — ce n'est pas une lecture.
+
+### Garde-fous
+
+Le jeton fait 32 octets aléatoires, n'est stocké que haché, vaut **60 secondes** et ne
+sert qu'une fois. Génère-le au moment du clic, pas au rendu de la page.
+
+**Aucun jeton n'est délivré pour un compte avec double authentification.** Une session
+ouverte par `loginUsingId()` ne traverse jamais le challenge TOTP, qui vit dans le flux de
+connexion par mot de passe : délivrer un lien contournerait silencieusement une protection
+que le titulaire a activée volontairement. Le compte passe par la page de connexion.
+
+**Aucun jeton n'est délivré pour un compte administrateur.** Une clé applicative permet
+déjà d'administrer le panel, mais pas d'ouvrir une session interactive d'administrateur.
+Ce refus limite les dégâts d'une fuite de clé.
+
+Les deux conditions sont revérifiées à la consommation du jeton, pas seulement à
+l'émission : le compte peut avoir changé entre-temps.
+
+La connexion est inscrite au journal d'activité du compte sous l'évènement `auth:sso`,
+visible par le titulaire dans son onglet Activity. La clé n'ayant pas de traduction dans
+le panel, elle s'affiche telle quelle.
+
+Le paramètre `redirect` est restreint à un chemin de ce panel. Un `//` en tête est refusé :
+un navigateur y verrait une URL relative au protocole, ce qui ferait de la route une
+redirection ouverte vers n'importe quel hôte.
+
+En cas de refus — jeton expiré, déjà utilisé, compte inéligible — le visiteur est redirigé
+vers `/auth/login`. La raison va dans les logs et non à l'écran : l'expliquer n'aiderait
+qu'une personne en train de sonder la route.
 
 ## Prise en compte par Wings
 
