@@ -133,6 +133,13 @@ Ce refus limite les dégâts d'une fuite de clé.
 Les deux conditions sont revérifiées à la consommation du jeton, pas seulement à
 l'émission : le compte peut avoir changé entre-temps.
 
+**Toute session déjà ouverte sur le panel dans ce navigateur est fermée.** La route
+appelle `logout()` puis invalide la session avant d'ouvrir la nouvelle. C'est délibéré :
+un lien SSO doit déposer le visiteur sur le compte du lien, pas sur celui qui traînait
+dans le navigateur. Conséquence pratique en phase de test — si tu es connecté en
+administrateur sur le panel et que tu cliques sur un lien SSO client, tu perds ta session
+d'administrateur. Utilise une fenêtre privée pour tester.
+
 La connexion est inscrite au journal d'activité du compte sous l'évènement `auth:sso`,
 visible par le titulaire dans son onglet Activity. La clé n'ayant pas de traduction dans
 le panel, elle s'affiche telle quelle.
